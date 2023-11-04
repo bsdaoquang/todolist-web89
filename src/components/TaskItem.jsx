@@ -9,11 +9,14 @@ const TaskItem = ({ task, onEdit, onDelete, onComplete }) => {
 		<List.Item
 			extra={
 				<Space>
-					<Button
-						onClick={onEdit}
-						icon={<i className='fas fa-edit text-success' />}
-						type='text'
-					/>
+					{!task.isCompleted && (
+						<Button
+							onClick={onEdit}
+							icon={<i className='fas fa-edit text-success' />}
+							type='text'
+						/>
+					)}
+
 					<Button
 						onClick={onDelete}
 						icon={<i className='fas fa-trash text-danger' />}
@@ -22,8 +25,22 @@ const TaskItem = ({ task, onEdit, onDelete, onComplete }) => {
 				</Space>
 			}>
 			<List.Item.Meta
-				avatar={<Checkbox onChange={(val) => onComplete(val.target.checked)} />}
-				title={task.content}
+				title={
+					<Checkbox
+						disabled={task.isCompleted}
+						checked={task.isCompleted}
+						onChange={(val) => onComplete(val.target.checked)}>
+						<p
+							style={{
+								margin: 0,
+								fontWeight: 'bold',
+								color: task.isCompleted ? '#dadada' : '#212121',
+								textDecorationLine: task.isCompleted ? 'line-through' : 'none',
+							}}>
+							{task.content}
+						</p>
+					</Checkbox>
+				}
 				description={dateTime(task.updateAt)}
 			/>
 		</List.Item>
