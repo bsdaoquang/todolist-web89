@@ -41,7 +41,7 @@ const TaskItem = ({ task, onEdit, onDelete, onComplete }) => {
 						</p>
 					</Checkbox>
 				}
-				description={dateTime(task.updateAt)}
+				description={`by: Me - ${dateTime(task.updateAt)}`}
 			/>
 		</List.Item>
 	);
