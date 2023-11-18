@@ -1,9 +1,17 @@
 /** @format */
 
-import { Button, Card, Divider, Input, List, Space } from 'antd';
+import { Button, Card, Input, List, Space, message } from 'antd';
+import {
+	addDoc,
+	collection,
+	deleteDoc,
+	doc,
+	onSnapshot,
+	updateDoc,
+} from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
-import { LOCAL_DATA_NAME } from '../constants';
 import TaskItem from '../components/TaskItem';
+import { db } from '../firebase/firebaseConfig';
 
 const HomeScreen = () => {
 	const [taskContent, setTaskContent] = useState('');
@@ -22,9 +30,22 @@ const HomeScreen = () => {
 	}, [taskIndex]);
 
 	const getTasks = () => {
-		const res = localStorage.getItem(LOCAL_DATA_NAME.tasks);
+		onSnapshot(collection(db, 'tasks'), (snap) => {
+			if (snap.empty) {
+				message.error('Data not found');
+			} else {
+				const items = [];
 
-		res && setTasks(JSON.parse(res));
+				snap.forEach((item) =>
+					items.push({
+						id: item.id,
+						...item.data(),
+					})
+				);
+
+				setTasks(items);
+			}
+		});
 	};
 
 	const handleAddNewTask = () => {
@@ -37,19 +58,18 @@ const HomeScreen = () => {
 			};
 
 			if (taskIndex >= 0) {
-				// update
+				const item = tasks[taskIndex];
 
-				const items = [...tasks];
-				data.createdAt = items[taskIndex].createdAt;
-
-				items[taskIndex] = data;
-
-				localStorage.setItem(LOCAL_DATA_NAME.tasks, JSON.stringify(items));
+				updateDoc(doc(db, `tasks/${item.id}`), {
+					content: taskContent,
+					updateAt: Date.now(),
+				}).then(() => message.success('Updated !!'));
 				setTaskIndex(undefined);
+				// update
 			} else {
-				// add new
-				tasks.push(data);
-				localStorage.setItem(LOCAL_DATA_NAME.tasks, JSON.stringify(tasks));
+				addDoc(collection(db, 'tasks'), data).then(() => {
+					console.log('Added');
+				});
 			}
 
 			setTaskContent('');
@@ -62,22 +82,16 @@ const HomeScreen = () => {
 	const handleEditTask = (index) => {
 		setTaskIndex(index);
 	};
-	const handleDeleteTask = (index) => {
-		const items = [...tasks];
-		items.splice(index, 1);
-
-		localStorage.setItem(LOCAL_DATA_NAME.tasks, JSON.stringify(items));
-		getTasks();
+	const handleDeleteTask = (id) => {
+		deleteDoc(doc(db, `tasks/${id}`)).then(() => {
+			message.success('Task deleted!!');
+		});
 	};
 
-	const handleCompleteTaks = (val, index) => {
-		const items = [...tasks];
-		const item = items[index];
-
-		item.isCompleted = val;
-
-		localStorage.setItem(LOCAL_DATA_NAME.tasks, JSON.stringify(items));
-		getTasks();
+	const handleCompleteTaks = (id) => {
+		updateDoc(doc(db, `tasks/${id}`), { isCompleted: true }).then(() =>
+			message.success('Updated!!')
+		);
 	};
 
 	return (
@@ -95,6 +109,7 @@ const HomeScreen = () => {
 							size='large'
 							placeholder='What do you want to do???'
 						/>
+
 						<Button onClick={handleAddNewTask} type='primary' size='large'>
 							{taskIndex >= 0 ? 'Update' : 'Submit'}
 						</Button>
@@ -106,8 +121,8 @@ const HomeScreen = () => {
 							renderItem={(item, index) => (
 								<TaskItem
 									task={item}
-									onComplete={(val) => handleCompleteTaks(val, index)}
-									onDelete={() => handleDeleteTask(index)}
+									onComplete={(val) => handleCompleteTaks(item.id)}
+									onDelete={() => handleDeleteTask(item.id)}
 									onEdit={() => handleEditTask(index)}
 								/>
 							)}
