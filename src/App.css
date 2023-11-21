@@ -13,6 +13,11 @@
   }
 }
 
+.menu-filter {
+  border-inline-end: 'none';
+  background-color: coral;
+}
+
 .App-header {
   background-color: #282c34;
   min-height: 100vh;

@@ -1,39 +1,56 @@
 /** @format */
 
-import React from 'react';
-import TitleComponent from './TitleComponent';
-import { colors } from '../constansts/colors';
-import { Avatar, Button } from 'antd';
-import { SearchNormal1 } from 'iconsax-react';
+import { Button, Radio } from 'antd';
+import React, { useEffect, useState } from 'react';
+import AddEventModal from '../modal/AddEventModal';
 
-const HeaderComponent = () => {
+const HeaderComponent = (props) => {
+	const { onCalendarSelected } = props;
+
+	const [calendaType, setCalendaType] = useState('month');
+	const [isVisibleModalAddEvent, setIsVisibleModalAddEvent] = useState(false);
+
+	useEffect(() => {
+		onCalendarSelected(calendaType);
+	}, [calendaType]);
+
 	return (
 		<div>
-			<div className='row ' style={{ padding: '30px 20px' }}>
-				<div className='col-3'>Health score</div>
-				<div className='col text-center'>
-					<TitleComponent
-						text={'Our best healthy'}
-						color={'rgba(255, 255, 255, 0.5)'}
-						weight={'500'}
-					/>
-					<TitleComponent text={'Food recipes'} color={colors.white} />
+			<div className='row  ' style={{ alignItems: 'center', padding: 10 }}>
+				<div className='col'>
+					<h1>Calendar</h1>
 				</div>
-				<div className='col-3'>
+				<div className='col'>
 					<div
 						className='row'
 						style={{
 							justifyContent: 'space-between',
-							display: 'flex',
 						}}>
+						<Radio.Group
+							value={calendaType}
+							size='large'
+							onChange={(val) => setCalendaType(val.target.value)}>
+							<Radio.Button value={'day'}> Day</Radio.Button>
+							<Radio.Button value={'week'}>Week</Radio.Button>
+							<Radio.Button value={'month'} type='primary'>
+								Month
+							</Radio.Button>
+						</Radio.Group>
 						<Button
-							type='text'
-							icon={<SearchNormal1 color={colors.white1} size={22} />}
-						/>
-						<Avatar size={34}>Q</Avatar>
+							onClick={() => setIsVisibleModalAddEvent(true)}
+							size='large'
+							color='coral'
+							type='primary'>
+							Add Event
+						</Button>
 					</div>
 				</div>
 			</div>
+
+			<AddEventModal
+				onClose={() => setIsVisibleModalAddEvent(false)}
+				isVisible={isVisibleModalAddEvent}
+			/>
 		</div>
 	);
 };
