@@ -2,7 +2,7 @@
 
 import { Button, Checkbox, List, Popover, Space } from 'antd';
 import React from 'react';
-import { dateTime } from '../utils/dateTime';
+import { DateTime, dateTime } from '../utils/dateTime';
 
 const TaskItem = ({ task, onEdit, onDelete, onComplete }) => {
 	return (
@@ -41,7 +41,7 @@ const TaskItem = ({ task, onEdit, onDelete, onComplete }) => {
 						</p>
 					</Checkbox>
 				}
-				description={`by: Me - ${dateTime(task.updateAt)}`}
+				description={`by: Me - ${DateTime.dateTime(task.updateAt)}`}
 			/>
 		</List.Item>
 	);

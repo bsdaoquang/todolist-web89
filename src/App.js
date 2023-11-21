@@ -1,25 +1,9 @@
 /** @format */
 
-import { ConfigProvider, Layout } from 'antd';
-import TimeTableScreen from './screens/TimeTableScreen';
+import AudioScreen from './screens/AudioScreen';
 
-const { Content } = Layout;
 function App() {
-	return (
-		<ConfigProvider
-			theme={{
-				token: {
-					colorPrimary: 'coral',
-					fontSize: 14,
-				},
-			}}>
-			<Layout style={{}}>
-				<Content>
-					<TimeTableScreen />
-				</Content>
-			</Layout>
-		</ConfigProvider>
-	);
+	return <AudioScreen />;
 }
 
 export default App;
